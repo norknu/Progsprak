@@ -1,0 +1,16 @@
+functor
+import
+   Application(exit:Exit)
+   System
+define
+   fun{Lex Input}
+      if Input != nil then
+	 {String.token Input & }
+      end
+   end
+   
+
+   {System.show{Lex "a b r e"}
+
+   {Exit 0}
+end

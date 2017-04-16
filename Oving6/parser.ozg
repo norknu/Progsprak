@@ -1,0 +1,49 @@
+parser OzParser from GumpParser.'class'
+
+   attr Debug
+
+   meth init(Scanner)
+      GumpParser.'class', init(Scanner)
+      Debug := false
+   end
+
+   meth setDebug()
+      Debug := true
+   end
+
+   meth unsetDebug()
+      Debug := false
+   end
+
+   meth debug(Parsed $)
+      if @Debug then
+         {System.printInfo 'P | '}
+         {System.show Parsed}
+      end
+      Parsed
+   end
+
+   token
+      'skip' 'local' 'in' 'identifier' 'end' 'true' 'false' 'if' 'else' 'then'
+
+   syn program(Program)
+      !Program = Statement($)
+   end
+
+   syn Statement($)
+      'skip' =>
+         {self debug(noop $)}
+   [] 'local' 'identifier'(V) 'in' Statement(S) 'end' =>
+         {self debug(loc(id:V stat:S) $)}
+   [] Statement(S1) Statement(S2) =>
+         {self debug(seq(S1 S2) $)}
+   [] 'if' 'identifier'(V) 'then' Statement(S1) 'else' Statement(S2) 'end' =>
+         {self debug(ifer(id:V stat1:S1 stat2:S2) $)}
+   [] 'identifier'(V) '=' 'true'
+         {self debug(ide(id:V boolean:1) $)}
+         %dollartegnet er en anonym stedfortreder, sier at du må ha et navn
+   [] 'identifier'(V) '=' 'false'
+         {self debug(ide(id:V boolean:0) $)}
+   end
+
+end

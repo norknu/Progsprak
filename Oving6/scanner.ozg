@@ -1,0 +1,64 @@
+scanner OzScanner from GumpScanner.'class'
+
+   % boolean flag for verbose output
+   attr Debug
+
+   meth init()
+      GumpScanner.'class', init()
+      Debug := false
+   end
+
+   % enable verbose debug output
+   meth setDebug()
+      Debug := true
+   end
+
+   % disable verbose debug output
+   meth unsetDebug()
+      Debug := false
+   end
+
+   % show verbose debug output
+   meth debug(Token Lexeme)
+      if @Debug then
+         {System.printInfo 'S | '}
+         {System.showInfo Token#': '#Lexeme}
+      end
+   end
+
+   meth classify(Token Lexeme)
+      {self getAtom(Lexeme)}
+      case Token of
+         'keyword' then {self putToken1(Lexeme)}
+      else {self putToken(Token Lexeme)} end
+      {self debug(Token Lexeme)}
+   end
+
+   lex keyword = <skip|local|in|true|false|end|if|else|then> end
+   lex identifier = <[A-Z][A-Za-z0-9]*> end
+   lex operator = <'='> end
+
+   lex <{keyword}> Lexeme in
+      {self classify('keyword' Lexeme)}
+   end
+
+   lex <{identifier}> Lexeme in
+      {self classify('identifier' Lexeme)}
+   end
+
+   lex <{operator}> Lexeme in
+      {self classify('operator' Lexeme)}
+   end
+
+   lex <[ \t\n]>
+      skip
+   end
+   lex <.> Character in
+      GumpScanner.'class', getAtom(Character)
+      GumpScanner.'class', putToken('error' Character)
+   end
+   lex <<EOF>>
+      GumpScanner.'class', putToken1('EOF')
+   end
+
+end
